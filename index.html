@@ -182,7 +182,84 @@
 
 
   <!-- PLACEHOLDERS (we’ll fill these next) -->
-  <section id="calc" class="page"><h1>Calculator</h1><p class="sub">We’ll wire this up after the nav is locked.</p></section>
+<section id="calc" class="page">
+  <h1>College of Wholesale Offer Calculator</h1>
+  <p class="sub">Simple v1: enter ARV + Repairs to get a beginner-friendly MAO and first-offer range.</p>
+
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:8px">
+    <!-- Inputs -->
+    <div class="card">
+      <h3>Inputs</h3>
+      <div class="row"><label for="v1_arv" style="min-width:180px">After-Repair Value (ARV)</label><input id="v1_arv" type="number" min="0" step="1000" placeholder="e.g., 350000"></div>
+      <div class="row"><label for="v1_repairs" style="min-width:180px">Repairs (total $)</label><input id="v1_repairs" type="number" min="0" step="500" placeholder="e.g., 25000"></div>
+      <div class="row"><label for="v1_disc" style="min-width:180px">Buyer Discount %</label><input id="v1_disc" type="number" min="40" max="90" step="1" value="70"></div>
+      <div class="row"><label for="v1_fee" style="min-width:180px">Your Assignment Fee ($)</label><input id="v1_fee" type="number" min="0" step="500" value="10000"></div>
+      <div class="row"><label for="v1_buf" style="min-width:180px">Closing Buffer % of ARV</label><input id="v1_buf" type="number" min="0" max="10" step="0.5" value="3"></div>
+      <div class="row" style="gap:8px;margin-top:12px">
+        <button id="v1_calc" class="btn">Calculate MAO</button>
+        <button id="v1_reset" class="btn secondary">Reset</button>
+      </div>
+      <p class="small" style="margin-top:8px">Formula: <em>MAO ≈ (ARV × Discount) − Repairs − Your Fee − (ARV × Buffer)</em></p>
+    </div>
+
+    <!-- Outputs -->
+    <div class="card">
+      <h3>Results</h3>
+      <div class="small">Max Allowable Offer (to seller)</div>
+      <div id="v1_mao" style="font-size:28px;font-weight:800;margin:6px 0">$0</div>
+      <div class="small">Suggested first-offer range</div>
+      <div id="v1_range" style="font-size:24px;font-weight:800;margin:6px 0">$0 – $0</div>
+
+      <div class="hr" style="margin:12px 0"></div>
+      <h4 style="margin:0 0 6px">Beginner Rules of Thumb</h4>
+      <ul class="small" style="margin:0 0 0 18px">
+        <li>Start with 70% rule (editable above).</li>
+        <li>Open 5–10% below MAO to leave room.</li>
+        <li>Use 2–4% of ARV for closing/holding buffer.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- tiny, isolated script just for this page -->
+  <script>
+    (function(){
+      const $ = (id)=>document.getElementById(id);
+      const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : "$0";
+      const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+      function calc(){
+        const arv = +($("v1_arv").value||0);
+        const repairs = +($("v1_repairs").value||0);
+        const disc = clamp(+($("v1_disc").value||70),40,90) / 100;
+        const fee = +($("v1_fee").value||0);
+        const buf = clamp(+($("v1_buf").value||3),0,10) / 100;
+
+        const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
+        $("v1_mao").textContent = money(Math.round(mao));
+        const low = Math.max(0, Math.round(mao * 0.90));
+        $("v1_range").textContent = money(low) + " – " + money(Math.round(mao));
+      }
+
+      function reset(){
+        $("v1_arv").value = "";
+        $("v1_repairs").value = "";
+        $("v1_disc").value = 70;
+        $("v1_fee").value = 10000;
+        $("v1_buf").value = 3;
+        $("v1_mao").textContent = "$0";
+        $("v1_range").textContent = "$0 – $0";
+      }
+
+      // hook up events after this section exists
+      document.addEventListener("DOMContentLoaded", function(){
+        const calcBtn = $("v1_calc");
+        const resetBtn = $("v1_reset");
+        if(calcBtn) calcBtn.addEventListener("click", calc);
+        if(resetBtn) resetBtn.addEventListener("click", reset);
+      });
+    })();
+  </script>
+</section>
 <section id="resources" class="page">
   <h1>Resources</h1>
   <p class="sub">Free beginner wholesaling training assets you can use today.</p>
