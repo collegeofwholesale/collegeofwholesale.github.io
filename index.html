@@ -390,10 +390,11 @@ if($("#rc_paint_in").checked){
         add("Roof", squares * RATES.roof_per_sq);
       }
 
-      if($("#rc_kitchen").checked){
-        const k = Math.max(1, +($("#rc_k_qty").value||1));
-        const kicker = Math.round((sqft/1000) * RATES.kitchen_sf_kicker_per_1000);
-        add(`Kitchen refresh ×${k}`, k * (RATES.kitchen_base + kicker));
+if ($("#rc_kitchen").checked) {
+  const kicker = Math.round((sqft / 1000) * RATES.kitchen_sf_kicker_per_1000);
+  add("Kitchen refresh", RATES.kitchen_base + kicker);
+}
+
       }
 
       if($("#rc_bath").checked){
