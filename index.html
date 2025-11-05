@@ -373,7 +373,12 @@ const STATE_MULT = {
       }
 
       // Items
-      if($("#rc_paint_in").checked)  add("Interior paint",  sqft * RATES.paint_in_psf);
+if($("#rc_paint_in").checked){
+  let raw = sqft * RATES.paint_in_psf;
+  const beds = Math.max(0, +($("#rc_bed_qty").value||0));
+  raw += beds * RATES.bedroom_paint_add;
+  add("Interior paint", raw);
+}
       if($("#rc_paint_out").checked) add("Exterior paint",  sqft * RATES.paint_out_psf);
       if($("#rc_floor").checked)     add("Flooring",       sqft * RATES.floor_psf);
 
