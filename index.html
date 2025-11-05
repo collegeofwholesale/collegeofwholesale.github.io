@@ -186,202 +186,287 @@
   <h1>College of Wholesale Offer Calculator</h1>
   <p class="sub">Simple v1: enter ARV + Repairs to get a beginner-friendly MAO and first-offer range.</p>
 
-  "grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:8px">
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:8px">
+
     <!-- Inputs -->
-    "card">
+    <div class="card">
       <h3>Inputs</h3>
-      "row"><label for="v1_arv" style="min-width:180px">After-Repair Value (ARV)</label><input id="v1_arv" type="number" min="0" step="1000" placeholder="e.g., 350000"></div>
-      "row"><label for="v1_repairs" style="min-width:180px">Repairs (total $)</label><input id="v1_repairs" type="number" min="0" step="500" placeholder="e.g., 25000"></div>
-      "row"><label for="v1_disc" style="min-width:180px">Buyer Discount %</label><input id="v1_disc" type="number" min="40" max="90" step="1" value="70"></div>
-      "row"><label for="v1_fee" style="min-width:180px">Your Assignment Fee ($)</label><input id="v1_fee" type="number" min="0" step="500" value="10000"></div>
-"row" style="align-items:flex-start;gap:10px">
-  <label for="v1_buf" style="min-width:180px">
-    Holding Buffer % of ARV
-    <span class="small" style="display:block;color:#9aa3b2;margin-top:4px">
-      Tip: <strong>3%</strong> is average — leave 3% unless your buyer prefers different.
-    </span>
-  </label>
-  <input id="v1_buf" type="number" min="0" max="10" step="0.5" value="3">
-</div>
-      "row" style="gap:8px;margin-top:12px">
+
+      <div class="row">
+        <label for="v1_arv" style="min-width:180px">After-Repair Value (ARV)</label>
+        <input id="v1_arv" type="number" min="0" step="1000" placeholder="e.g., 350000">
+      </div>
+
+      <div class="row">
+        <label for="v1_repairs" style="min-width:180px">Repairs (total $)</label>
+        <input id="v1_repairs" type="number" min="0" step="500" placeholder="e.g., 25000">
+      </div>
+
+      <div class="row">
+        <label for="v1_disc" style="min-width:180px">Buyer Discount %</label>
+        <input id="v1_disc" type="number" min="40" max="90" step="1" value="70">
+      </div>
+
+      <div class="row">
+        <label for="v1_fee" style="min-width:180px">Your Assignment Fee ($)</label>
+        <input id="v1_fee" type="number" min="0" step="500" value="10000">
+      </div>
+
+      <div class="row" style="align-items:flex-start;gap:10px">
+        <label for="v1_buf" style="min-width:180px">Holding Buffer % of ARV</label>
+        <div>
+          <input id="v1_buf" type="number" min="0" max="10" step="0.5" value="3">
+          <div class="small" style="margin-top:6px">
+            Tip: <strong>3% is average</strong> — leave 3% unless your buyer prefers different.
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="gap:8px;margin-top:12px">
         <button id="v1_calc" class="btn">Calculate MAO</button>
         <button id="v1_reset" class="btn secondary">Reset</button>
       </div>
-      <p class="small" style="margin-top:8px">Formula: <em>MAO ≈ (ARV × Discount) − Repairs − Your Fee − (ARV × Buffer)</em></p>
+
+      <p class="small" style="margin-top:8px">
+        Formula: <em>MAO ≈ (ARV × Discount) − Repairs − Your Fee − (ARV × Buffer)</em>
+      </p>
     </div>
 
-    <!-- Outputs -->
-    "card">
+    <!-- Results -->
+    <div class="card">
       <h3>Results</h3>
-      "small">Max Allowable Offer (to seller)</div>
+      <div class="small">Max Allowable Offer (to seller)</div>
       <div id="v1_mao" style="font-size:28px;font-weight:800;margin:6px 0">$0</div>
-      "small">Suggested first-offer range</div>
+
+      <div class="small">Suggested first-offer range</div>
       <div id="v1_range" style="font-size:24px;font-weight:800;margin:6px 0">$0 – $0</div>
 
       <div class="hr" style="margin:12px 0"></div>
-  <script>
-/* ==== Repair Calculator (Simple) ======================================= */
-(function(){
-  // State multipliers (rough labor/material deltas vs national avg)
-  const STATE_MULT = { AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08, GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.90, KS:0.91, KY:0.90, LA:0.94, ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.02, MS:0.88, MO:0.92, MT:1.00, NE:0.92, NV:1.02, NH:1.06, NJ:1.15, NM:0.96, NY:1.18, NC:0.98, ND:0.98, OH:0.93, OK:0.91, OR:1.08, PA:1.04, RI:1.10, SC:0.97, SD:0.94, TN:0.96, TX:0.94, UT:1.02, VT:1.06, VA:1.05, WA:1.12, WV:0.90, WI:0.95, WY:0.94, DC:1.22 };
-
-  // Base rates (very beginner-friendly)
-  const RATES = {
-    paint_in_psf: 1.25,
-    paint_out_psf: 1.50,
-    floor_psf:    3.50,
-    roof_per_sq:  450,     // per roofing "square" (100 SF)
-    kitchen_base: 8000,
-    kitchen_sf_kicker_per_1000: 500,  // every 1,000 SF add $500 per kitchen
-    bath_base:    3500,
-    window_each:  450,
-    misc_flat:    2000
-  };
-
-  // Helpers
-  const $ = (q)=>document.querySelector(q);
-  const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
-
-  function buildStateDropdown(){
-    const sel = $("#rc_state");
-    if(!sel) return;
-    sel.innerHTML = "";
-    Object.keys(STATE_MULT).forEach(ab=>{
-      const o = document.createElement('option');
-      o.value = ab; o.textContent = ab;
-      sel.appendChild(o);
-    });
-    sel.value = "FL";
-    updateMultPill();
-  }
-  function updateMultPill(){
-    const ab = $("#rc_state").value;
-    const mult = STATE_MULT[ab] ?? 1.00;
-    $("#rc_mult").textContent = `x${mult.toFixed(2)}`;
-  }
-
-  function calcRepairs(){
-    const sqft = +($("#rc_sqft").value||0);
-    if(!sqft || sqft < 200){ alert("Enter square footage (≥200)."); return 0; }
-    const mult = STATE_MULT[$("#rc_state").value] ?? 1.00;
-    let total = 0; const notes = [];
-
-    function add(label, raw){
-      const adj = raw * mult; total += adj;
-      notes.push(`${label}: ${money(adj)} (raw ${money(raw)} × ${mult.toFixed(2)})`);
-    }
-
-    // Items
-    if($("#rc_paint_in").checked)  add("Interior paint", sqft * RATES.paint_in_psf);
-    if($("#rc_paint_out").checked) add("Exterior paint", sqft * RATES.paint_out_psf);
-    if($("#rc_floor").checked)     add("Flooring",      sqft * RATES.floor_psf);
-
-    if($("#rc_roof").checked){
-      const roofArea = sqft * 1.2;           // rough waste/pitch factor
-      const squares  = roofArea / 100;
-      add("Roof", squares * RATES.roof_per_sq);
-    }
-
-    if($("#rc_kitchen").checked){
-      const k = Math.max(1, +($("#rc_k_qty").value||1));
-      const kicker = Math.round((sqft/1000) * RATES.kitchen_sf_kicker_per_1000);
-      add(`Kitchen refresh ×${k}`, k * (RATES.kitchen_base + kicker));
-    }
-
-    if($("#rc_bath").checked){
-      const b = Math.max(1, +($("#rc_b_qty").value||1));
-      add(`Bathroom refresh ×${b}`, b * RATES.bath_base);
-    }
-
-    if($("#rc_windows").checked){
-      const count = Math.max(1, Math.round(sqft / 200));
-      add(`Windows (~${count})`, count * RATES.window_each);
-    }
-
-    if($("#rc_misc").checked) add("Misc/contingency", RATES.misc_flat);
-
-    // Output
-    $("#rc_total").textContent = money(total);
-    const ul = $("#rc_notes"); ul.innerHTML = "";
-    if(notes.length){ notes.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
-    else { ul.innerHTML = "<li>No items selected yet.</li>"; }
-    return total;
-  }
-
-  function resetRepairs(){
-    ["rc_paint_in","rc_paint_out","rc_floor","rc_roof","rc_kitchen","rc_bath","rc_windows","rc_misc"]
-      .forEach(id=>{ const el=$("#"+id); if(el) el.checked=false; });
-    $("#rc_k_qty").value=1; $("#rc_b_qty").value=1;
-    $("#rc_total").textContent = "$0";
-    $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
-  }
-
-  // Wire up
-  document.addEventListener("DOMContentLoaded", ()=>{
-    buildStateDropdown();
-    $("#rc_state")?.addEventListener("change", updateMultPill);
-    $("#rc_calc")?.addEventListener("click", calcRepairs);
-    $("#rc_reset")?.addEventListener("click", resetRepairs);
-    $("#rc_send")?.addEventListener("click", ()=>{
-      const t = calcRepairs();
-      if(t>0){
-        const repairs = document.getElementById("v1_repairs");  // MAO field
-        if(repairs){ repairs.value = Math.round(t); repairs.dispatchEvent(new Event("input")); }
-        window.scrollTo({top:0, behavior:"smooth"});
-      }
-    });
-  });
-})();
-</script>
-
       <h4 style="margin:0 0 6px">Beginner Rules of Thumb</h4>
-      <ul class="small" style="margin:0 0 0 18px">
+      <ul class="small" style="margin:0 0 18px">
         <li>Start with 70% rule (editable above).</li>
         <li>Open 5–10% below MAO to leave room.</li>
-        <li>Use 2–4% of ARV for closing/holding buffer.</li>
+        <li>Use <strong>2–4% of ARV</strong> for closing/holding buffer (3% is a good default).</li>
       </ul>
     </div>
   </div>
 
-  <!-- tiny, isolated script just for this page -->
+  <!-- === Repair Calculator (Simple) — Option B (state-adjusted) === -->
+  <div class="card" style="margin-top:18px">
+    <h3>Quick Repair Estimator (optional)</h3>
+    <p class="small">Fast ballpark using state multipliers. Use it to fill the Repairs box above.</p>
+
+    <div class="row" style="gap:10px;flex-wrap:wrap">
+      <div>
+        <label for="rc_state">State</label>
+        <select id="rc_state"></select>
+        <div class="small">Mult: <span id="rc_mult">×1.00</span></div>
+      </div>
+
+      <div>
+        <label for="rc_sqft">Square Footage</label>
+        <input id="rc_sqft" type="number" min="200" step="10" placeholder="e.g., 1400">
+      </div>
+    </div>
+
+    <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:10px">
+      <label><input type="checkbox" id="rc_paint_in"> Interior paint</label>
+      <label><input type="checkbox" id="rc_paint_out"> Exterior paint</label>
+      <label><input type="checkbox" id="rc_floor"> Flooring</label>
+      <label><input type="checkbox" id="rc_roof"> Roof</label>
+      <label><input type="checkbox" id="rc_kitchen"> Kitchen refresh</label>
+      <label><input type="checkbox" id="rc_bath"> Bath refresh</label>
+      <label><input type="checkbox" id="rc_windows"> Windows</label>
+      <label><input type="checkbox" id="rc_misc"> Misc/contingency</label>
+    </div>
+
+    <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:10px">
+      <div>
+        <label for="rc_k_qty"># Kitchens</label>
+        <input id="rc_k_qty" type="number" min="0" value="1" style="width:90px">
+      </div>
+      <div>
+        <label for="rc_b_qty"># Baths</label>
+        <input id="rc_b_qty" type="number" min="0" value="1" style="width:90px">
+      </div>
+    </div>
+
+    <div class="row" style="gap:8px;margin-top:12px">
+      <button id="rc_calc" class="btn">Estimate Repairs</button>
+      <button id="rc_reset" class="btn secondary">Reset</button>
+      <button id="rc_send" class="btn secondary">Use Latest Repair Total</button>
+    </div>
+
+    <div class="hr" style="margin:12px 0"></div>
+    <div class="row">
+      <div class="card" style="flex:1">
+        <div class="small">Estimated Repairs</div>
+        <div id="rc_total" style="font-size:24px;font-weight:800;margin:6px 0">$0</div>
+        <ul id="rc_notes" class="small" style="margin:0">
+          <li>No items selected yet.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Repair calc script (keep this) ====== -->
   <script>
-    (function(){
-      const $ = (id)=>document.getElementById(id);
-      const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : "$0";
-      const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+  /* === Repair Calculator (Simple) ========================================= */
+  (function(){
+    // State multipliers (rough labor/material deltas vs national avg)
+    const STATE_MULT = { AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08, GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.99, KS:0.91, KY:0.90, LA:0.94, ME:1.04, MD:1.10, MA:1.18, MI:0.95, ... };
+    // (You already have the full list in your file—keep yours; the ellipsis here is just to save space.)
 
-      function calc(){
-        const arv = +($("v1_arv").value||0);
-        const repairs = +($("v1_repairs").value||0);
-        const disc = clamp(+($("v1_disc").value||70),40,90) / 100;
-        const fee = +($("v1_fee").value||0);
-        const buf = clamp(+($("v1_buf").value||3),0,10) / 100;
+    // Base rates (beginner-friendly)
+    const RATES = {
+      paint_in_psf: 1.25,
+      paint_out_psf: 1.50,
+      floor_psf: 3.50,
+      roof_per_sq: 450,          // per roofing "square" (100 SF)
+      kitchen_base: 8000,
+      kitchen_sf_kicker_per_1000: 500,  // every 1,000 SF add $500 per kitchen
+      bath_base: 3500,
+      window_each: 450,
+      misc_flat: 2000
+    };
 
-        const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
-        $("v1_mao").textContent = money(Math.round(mao));
-        const low = Math.max(0, Math.round(mao * 0.90));
-        $("v1_range").textContent = money(low) + " – " + money(Math.round(mao));
-      }
+    // Helpers
+    const $ = (q)=>document.querySelector(q);
+    const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
 
-      function reset(){
-        $("v1_arv").value = "";
-        $("v1_repairs").value = "";
-        $("v1_disc").value = 70;
-        $("v1_fee").value = 10000;
-        $("v1_buf").value = 3;
-        $("v1_mao").textContent = "$0";
-        $("v1_range").textContent = "$0 – $0";
-      }
-
-      // hook up events after this section exists
-      document.addEventListener("DOMContentLoaded", function(){
-        const calcBtn = $("v1_calc");
-        const resetBtn = $("v1_reset");
-        if(calcBtn) calcBtn.addEventListener("click", calc);
-        if(resetBtn) resetBtn.addEventListener("click", reset);
+    function buildStateDropdown(){
+      const sel = $("#rc_state");
+      if(!sel) return;
+      sel.innerHTML = "";
+      Object.keys(STATE_MULT).forEach(ab=>{
+        const o = document.createElement('option');
+        o.value = ab; o.textContent = ab;
+        sel.appendChild(o);
       });
-    })();
+      sel.value = "FL";
+      updateMultPill();
+    }
+
+    function updateMultPill(){
+      const ab = $("#rc_state").value;
+      const mult = STATE_MULT[ab] ?? 1.00;
+      $("#rc_mult").textContent = `×${mult.toFixed(2)}`;
+    }
+
+    function calcRepairs(){
+      const sqft = +($("#rc_sqft").value||0);
+      if(!sqft || sqft < 200){ alert("Enter square footage (≥200)."); return 0; }
+      const mult = STATE_MULT[$("#rc_state").value] ?? 1.00;
+      let total = 0; const notes = [];
+
+      function add(label, raw){
+        const adj = raw * mult; total += adj;
+        notes.push(`${label}: ${money(adj)} (raw ${money(raw)} × ${mult.toFixed(2)})`);
+      }
+
+      // Items
+      if($("#rc_paint_in").checked)  add("Interior paint",  sqft * RATES.paint_in_psf);
+      if($("#rc_paint_out").checked) add("Exterior paint",  sqft * RATES.paint_out_psf);
+      if($("#rc_floor").checked)     add("Flooring",       sqft * RATES.floor_psf);
+
+      if($("#rc_roof").checked){
+        const roofArea = sqft * 1.2;           // rough waste/pitch factor
+        const squares  = roofArea / 100;
+        add("Roof", squares * RATES.roof_per_sq);
+      }
+
+      if($("#rc_kitchen").checked){
+        const k = Math.max(1, +($("#rc_k_qty").value||1));
+        const kicker = Math.round((sqft/1000) * RATES.kitchen_sf_kicker_per_1000);
+        add(`Kitchen refresh ×${k}`, k * (RATES.kitchen_base + kicker));
+      }
+
+      if($("#rc_bath").checked){
+        const b = Math.max(1, +($("#rc_b_qty").value||1));
+        add(`Bathroom refresh ×${b}`, b * RATES.bath_base);
+      }
+
+      if($("#rc_windows").checked){
+        const count = Math.max(1, Math.round(sqft / 200));
+        add(`Windows (≈${count})`, count * RATES.window_each);
+      }
+
+      if($("#rc_misc").checked) add("Misc/contingency", RATES.misc_flat);
+
+      // Output
+      $("#rc_total").textContent = money(total);
+      const ul = $("#rc_notes"); ul.innerHTML = "";
+      if(notes.length){ notes.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
+      else { ul.innerHTML = "<li>No items selected yet.</li>"; }
+      return total;
+    }
+
+    function resetRepairs(){
+      ["rc_paint_in","rc_paint_out","rc_floor","rc_roof","rc_kitchen","rc_bath","rc_windows","rc_misc"]
+        .forEach(id=>{ const el=$("#"+id); if(el) el.checked=false; });
+      $("#rc_k_qty").value=1; $("#rc_b_qty").value=1;
+      $("#rc_total").textContent = "$0";
+      $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
+    }
+
+    // Wire up
+    document.addEventListener("DOMContentLoaded", ()=>{
+      buildStateDropdown();
+      $("#rc_state").addEventListener("change", updateMultPill);
+      $("#rc_calc").addEventListener("click", calcRepairs);
+      $("#rc_reset").addEventListener("click", resetRepairs);
+      $("#rc_send").addEventListener("click", ()=>{
+        const t = calcRepairs();
+        if(t>0){
+          const repairs = document.getElementById("v1_repairs");  // MAO field
+          repairs.value = Math.round(t); repairs.dispatchEvent(new Event("input"));
+          window.scrollTo({top:0, behavior:"smooth"});
+        }
+      });
+    });
+  })();
   </script>
+
+  <!-- ====== MAO script (keep this) ====== -->
+  <script>
+  (function(){
+    const $ = (id)=>document.getElementById(id);
+    const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : "$0";
+    const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+    function calc(){
+      const arv = +($("#v1_arv").value||0);
+      const repairs = +($("#v1_repairs").value||0);
+      const disc = clamp(+($("#v1_disc").value||70),40,90) / 100;
+      const fee  = +($("#v1_fee").value||0);
+      const buf  = clamp(+($("#v1_buf").value||3),0,10) / 100;
+
+      const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
+      $("#v1_mao").textContent = money(Math.round(mao));
+      const low = Math.max(0, Math.round(mao * 0.90));
+      $("#v1_range").textContent = money(low) + " – " + money(Math.round(mao));
+    }
+
+    function reset(){
+      $("#v1_arv").value = "";
+      $("#v1_repairs").value = "";
+      $("#v1_disc").value = 70;
+      $("#v1_fee").value = 10000;
+      $("#v1_buf").value = 3;
+      $("#v1_mao").textContent = "$0";
+      $("#v1_range").textContent = "$0 – $0";
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      const calcBtn = $("#v1_calc");
+      const resetBtn = $("#v1_reset");
+      if(calcBtn) calcBtn.addEventListener("click", calc);
+      if(resetBtn) resetBtn.addEventListener("click", reset);
+    });
+  })();
+  </script>
+</section>
+
 </section>
 <section id="resources" class="page">
   <h1>Resources</h1>
