@@ -311,137 +311,158 @@
 
   <!-- ====== Repair calc script (keep this) ====== -->
   <script>
-  /* === Repair Calculator (Simple) ========================================= */
-  (function(){
-    // State multipliers (rough labor/material deltas vs national avg)
-const STATE_MULT = {
-  AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, DC:1.18,
-  FL:1.08, GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.99, KS:0.91, KY:0.90,
-  LA:0.94, ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.02, MS:0.88, MO:0.95, MT:1.00,
-  NE:0.98, NV:1.06, NH:1.06, NJ:1.15, NM:0.96, NY:1.18, NC:0.98, ND:1.00, OH:0.96,
-  OK:0.90, OR:1.10, PA:1.04, RI:1.08, SC:0.96, SD:0.98, TN:0.96, TX:0.98, UT:1.04,
-  VT:1.06, VA:1.02, WA:1.14, WV:0.92, WI:0.98, WY:0.98
-};
+<!-- ===== Repair Calculator (Simple) =============================== -->
+<script>
+(function () {
+  /* ---------- State multipliers (coarse; labor/material deltas) ---------- */
+  const STATE_MULT = {
+    AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08,
+    GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.90, KS:0.91, KY:0.90, LA:0.94,
+    ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.02, MS:0.88, MO:0.96, MT:0.98, NE:0.95,
+    NV:1.02, NH:1.04, NJ:1.10, NM:0.98, NY:1.18, NC:0.98, ND:1.00, OH:0.95, OK:0.92,
+    OR:1.06, PA:1.02, RI:1.06, SC:0.96, SD:0.96, TN:0.96, TX:0.98, UT:1.02, VT:1.06,
+    VA:1.02, WA:1.10, WV:0.92, WI:0.98, WY:0.96
+  };
 
-};
-    // (You already have the full list in your file—keep yours; the ellipsis here is just to save space.)
+  /* ---------- Base rates (beginner-friendly ballpark values) ------------- */
+  const RATES = {
+    paint_in_psf: 1.25,
+    paint_out_psf: 1.50,
+    floor_psf:    3.50,
+    roof_per_sq:  450,     // per roofing "square" (100 sf)
+    kitchen_base: 8000,
+    kitchen_sf_kicker_per_1000: 500,  // +$500 per 1,000 sf
+    bath_base:    3500,
+    window_each:  450,
+    misc_flat:    2000,
+    bedroom_paint_add: 150  // small add for interior paint per bedroom
+  };
 
-    // Base rates (beginner-friendly)
-    const RATES = {
-      paint_in_psf: 1.25,
-      paint_out_psf: 1.50,
-      floor_psf: 3.50,
-      roof_per_sq: 450,          // per roofing "square" (100 SF)
-      kitchen_base: 8000,
-      kitchen_sf_kicker_per_1000: 500,  // every 1,000 SF add $500 per kitchen
-      bath_base: 3500,
-      window_each: 450,
-      misc_flat: 2000
-      bedroom_paint_add: 150,   // small add for doors/closets per bedroom if interior paint selected
-    };
+  /* ---------- Small helpers --------------------------------------------- */
+  const $ = (q) => document.querySelector(q);
+  const money = (n) =>
+    isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
 
-    // Helpers
-    const $ = (q)=>document.querySelector(q);
-    const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
+  const selState = $('#rc_state');
+  const pill     = $('#rc_mult');
+  const sqftEl   = $('#rc_sqft');
+  const bedsEl   = $('#rc_bed_qty');
+  const outTotal = $('#rc_total');
+  const outNotes = $('#rc_notes');
 
-    function buildStateDropdown(){
-      const sel = $("#rc_state");
-      if(!sel) return;
-      sel.innerHTML = "";
-      Object.keys(STATE_MULT).forEach(ab=>{
-        const o = document.createElement('option');
-        o.value = ab; o.textContent = ab;
-        sel.appendChild(o);
-      });
-      sel.value = "FL";
-      updateMultPill();
-    }
+  function safeVal(el, def = 0) {
+    const v = +((el && el.value) || def);
+    return isFinite(v) ? v : def;
+  }
 
-    function updateMultPill(){
-      const ab = $("#rc_state").value;
-      const mult = STATE_MULT[ab] ?? 1.00;
-      $("#rc_mult").textContent = `×${mult.toFixed(2)}`;
-    }
-
-    function calcRepairs(){
-      const sqft = +($("#rc_sqft").value||0);
-      if(!sqft || sqft < 200){ alert("Enter square footage (≥200)."); return 0; }
-      const mult = STATE_MULT[$("#rc_state").value] ?? 1.00;
-      let total = 0; const notes = [];
-
-      function add(label, raw){
-        const adj = raw * mult; total += adj;
-        notes.push(`${label}: ${money(adj)} (raw ${money(raw)} × ${mult.toFixed(2)})`);
-      }
-
-      // Items
-if($("#rc_paint_in").checked){
-  let raw = sqft * RATES.paint_in_psf;
-  const beds = Math.max(0, +($("#rc_bed_qty").value||0));
-  raw += beds * RATES.bedroom_paint_add;
-  add("Interior paint", raw);
-}
-      if($("#rc_paint_out").checked) add("Exterior paint",  sqft * RATES.paint_out_psf);
-      if($("#rc_floor").checked)     add("Flooring",       sqft * RATES.floor_psf);
-
-      if($("#rc_roof").checked){
-        const roofArea = sqft * 1.2;           // rough waste/pitch factor
-        const squares  = roofArea / 100;
-        add("Roof", squares * RATES.roof_per_sq);
-      }
-
-if ($("#rc_kitchen").checked) {
-  const kicker = Math.round((sqft / 1000) * RATES.kitchen_sf_kicker_per_1000);
-  add("Kitchen refresh", RATES.kitchen_base + kicker);
-}
-
-      }
-
-      if($("#rc_bath").checked){
-        const b = Math.max(1, +($("#rc_b_qty").value||1));
-        add(`Bathroom refresh ×${b}`, b * RATES.bath_base);
-      }
-
-      if($("#rc_windows").checked){
-        const count = Math.max(1, Math.round(sqft / 200));
-        add(`Windows (≈${count})`, count * RATES.window_each);
-      }
-
-      if($("#rc_misc").checked) add("Misc/contingency", RATES.misc_flat);
-
-      // Output
-      $("#rc_total").textContent = money(total);
-      const ul = $("#rc_notes"); ul.innerHTML = "";
-      if(notes.length){ notes.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
-      else { ul.innerHTML = "<li>No items selected yet.</li>"; }
-      return total;
-    }
-
-    function resetRepairs(){
-      ["rc_paint_in","rc_paint_out","rc_floor","rc_roof","rc_kitchen","rc_bath","rc_windows","rc_misc"]
-        .forEach(id=>{ const el=$("#"+id); if(el) el.checked=false; });
-$("#rc_bed_qty").value=1; $("#rc_b_qty").value=1;
-      $("#rc_total").textContent = "$0";
-      $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
-    }
-
-    // Wire up
-    document.addEventListener("DOMContentLoaded", ()=>{
-      buildStateDropdown();
-      $("#rc_state").addEventListener("change", updateMultPill);
-      $("#rc_calc").addEventListener("click", calcRepairs);
-      $("#rc_reset").addEventListener("click", resetRepairs);
-      $("#rc_send").addEventListener("click", ()=>{
-        const t = calcRepairs();
-        if(t>0){
-          const repairs = document.getElementById("v1_repairs");  // MAO field
-          repairs.value = Math.round(t); repairs.dispatchEvent(new Event("input"));
-          window.scrollTo({top:0, behavior:"smooth"});
-        }
-      });
+  function buildStateDropdown() {
+    if (!selState) return;
+    selState.innerHTML = '';
+    Object.keys(STATE_MULT).forEach((abbrev) => {
+      const o = document.createElement('option');
+      o.value = abbrev;
+      o.textContent = abbrev;
+      selState.appendChild(o);
     });
-  })();
-  </script>
+    selState.value = 'FL';
+    updateMultPill();
+  }
+
+  function updateMultPill() {
+    if (!pill || !selState) return;
+    const mult = STATE_MULT[selState.value] ?? 1.00;
+    pill.textContent = `×${mult.toFixed(2)}`;
+  }
+
+  function calcRepairs() {
+    const sqft  = safeVal(sqftEl, 0);
+    if (!sqft || sqft < 200) { alert('Enter square footage (≥200).'); return 0; }
+    const mult  = STATE_MULT[selState?.value] ?? 1.00;
+
+    let total = 0;
+    const notes = [];
+
+    function add(label, raw) {
+      const adj = raw * mult;
+      total += adj;
+      notes.push(`${label}: ${money(adj)}  (raw ${money(raw)} × ${mult.toFixed(2)})`);
+    }
+
+    // line items
+    const beds = Math.max(0, safeVal(bedsEl, 0));
+
+    if ($('#rc_paint_in')?.checked) {
+      let raw = sqft * RATES.paint_in_psf;
+      raw += beds * RATES.bedroom_paint_add;
+      add('Interior paint', raw);
+    }
+    if ($('#rc_paint_out')?.checked) add('Exterior paint', sqft * RATES.paint_out_psf);
+    if ($('#rc_floor')?.checked)    add('Flooring',      sqft * RATES.floor_psf);
+
+    if ($('#rc_roof')?.checked) {
+      const roofArea = sqft * 1.2;       // rough waste/pitch factor
+      const squares  = roofArea / 100;
+      add('Roof', squares * RATES.roof_per_sq);
+    }
+
+    if ($('#rc_kitchen')?.checked) {
+      const kicker = Math.round((sqft / 1000) * RATES.kitchen_sf_kicker_per_1000);
+      add('Kitchen refresh', RATES.kitchen_base + kicker);
+    }
+    if ($('#rc_bath')?.checked)     add('Bathroom refresh', RATES.bath_base);
+    if ($('#rc_windows')?.checked)  add('Windows', Math.max(1, Math.round(sqft / 200)) * RATES.window_each);
+    if ($('#rc_misc')?.checked)     add('Misc/contingency', RATES.misc_flat);
+
+    if (outTotal) outTotal.textContent = money(total);
+    if (outNotes) {
+      outNotes.innerHTML = '';
+      if (notes.length) {
+        notes.forEach((t) => {
+          const li = document.createElement('li');
+          li.textContent = t;
+          outNotes.appendChild(li);
+        });
+      } else {
+        outNotes.innerHTML = '<li>No items selected yet.</li>';
+      }
+    }
+    return total;
+  }
+
+  function resetRepairs() {
+    ['rc_paint_in','rc_paint_out','rc_floor','rc_roof','rc_kitchen','rc_bath','rc_windows','rc_misc']
+      .forEach((id) => { const el = document.getElementById(id); if (el) el.checked = false; });
+    if (bedsEl) bedsEl.value = 1;
+    if (sqftEl) sqftEl.value = '';
+    if (outTotal) outTotal.textContent = '$0';
+    if (outNotes) outNotes.innerHTML = '<li>No items selected yet.</li>';
+  }
+
+  // Wire up (guard each step so one missing element doesn't break the page)
+  document.addEventListener('DOMContentLoaded', () => {
+    try { buildStateDropdown(); } catch(e){}
+    if (selState) selState.addEventListener('change', () => { try { updateMultPill(); } catch(e){} });
+
+    const btnCalc  = $('#rc_calc');
+    const btnReset = $('#rc_reset');
+    const btnSend  = $('#rc_send');
+
+    if (btnCalc)  btnCalc.addEventListener('click', () => { try { calcRepairs(); } catch(e){} });
+    if (btnReset) btnReset.addEventListener('click', () => { try { resetRepairs(); } catch(e){} });
+    if (btnSend)  btnSend.addEventListener('click', () => {
+      try {
+        const t = calcRepairs();
+        const repairsField = document.getElementById('v1_repairs'); // MAO “Repairs (total $)”
+        if (repairsField && t) {
+          repairsField.value = Math.round(t);
+          repairsField.dispatchEvent(new Event('input'));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch(e){}
+    });
+  });
+})();
+</script>
 
   <!-- ====== MAO script (keep this) ====== -->
 <script>
