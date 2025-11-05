@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>College of Wholesale</title>
 <style>
-  :root{--bg:#0b0f1a;--ink:#e6ebff;--muted:#9aa3b2;--line:#1e2740;--accent:#6ea8ff}
+  :root{
+    --bg:#0b0f1a; --ink:#e6ebff; --muted:#9aa3b2; --line:#1e2740; --accent:#6ea8ff; --accent2:#8cffc7;
+    --card:#121829;
+  }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   a{color:var(--accent);text-decoration:none}
   .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
 
-  /* NAV */
+  /* NAV (unchanged — proven working) */
   .nav{position:sticky;top:0;z-index:10;background:rgba(11,15,26,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .navin{display:flex;gap:10px;align-items:center;min-height:60px}
   .brand{font-weight:900;margin-right:auto}
@@ -21,8 +24,25 @@
   /* PAGES */
   section.page{display:none;padding:56px 0}
   section.page.active{display:block}
-  h1{margin:0 0 8px}
+  h1{margin:0 0 8px;font-size:clamp(28px,4vw,44px)}
+  h2{margin:0 0 12px}
   .sub{color:var(--muted);margin:0 0 16px}
+
+  /* Home visuals */
+  .hero{padding:56px 0;background:radial-gradient(900px 350px at 50% -60%, rgba(110,168,255,.18), transparent 70%)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+  .chip{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px}
+
+  .btn{display:inline-block;background:linear-gradient(135deg,var(--accent),#7bb6ff);color:#08122b;font-weight:800;border:none;padding:10px 14px;border-radius:12px}
+  .btn.secondary{background:#0b1020;color:var(--ink);border:1px solid var(--line)}
+  .grid{display:grid;gap:14px}
+  .grid.quick{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{background:linear-gradient(180deg,var(--card) 0%,#0f1424 100%);border:1px solid var(--line);border-radius:18px;padding:18px}
+
+  /* About cards */
+  .grid.about{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  ul.small, ol.small{margin:8px 0 0 18px;color:var(--ink)}
+  .muted{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -44,73 +64,98 @@
 
 <!-- PAGES -->
 <main class="wrap">
+
+  <!-- HOME (restored) -->
   <section id="home" class="page active">
-    <h1>Home</h1>
-    <p class="sub">Welcome to CoW. (Router-only test page.)</p>
+    <div class="hero">
+      <h1>Learn wholesaling the simple way.<br/>Use the tools. Get the reps. Close the deal.</h1>
+      <p class="sub">CoW gives beginners a clear path: daily actions, beginner-friendly calculators, scripts, and a community that helps you win your first contract.</p>
+      <div class="chips">
+        <span class="chip">✅ Beginner-Friendly</span>
+        <span class="chip">🧮 Offer & Repair Calculator</span>
+        <span class="chip">📚 Notion SOPs</span>
+        <span class="chip">🟣 Whop Community (includes Discord)</span>
+      </div>
+
+      <!-- Quick links (no green floating button, Whop replaces Discord) -->
+      <div class="grid quick">
+        <a class="btn secondary" href="#notion">Open Notion Hub</a>
+        <a class="btn secondary" href="#whop">Join on Whop</a>
+        <a class="btn secondary" href="#intern">Internship Program</a>
+        <a class="btn"           href="#calc">Open Calculator</a>
+      </div>
+    </div>
   </section>
 
+  <!-- ABOUT (restored with more boxes; no last name) -->
   <section id="about" class="page">
-    <h1>About</h1>
-    <p class="sub">This is the About page.</p>
+    <h1>About College of Wholesale</h1>
+    <p class="sub">Founded by Arya, CoW helps new wholesalers master fundamentals through systems, scripts, and reps — not theory.</p>
+
+    <div class="grid about">
+      <div class="card">
+        <h3>Our Approach</h3>
+        <ul class="small">
+          <li>Simple tools you’ll actually use on calls</li>
+          <li>Clear SOPs for list pulling, tagging, and follow-up</li>
+          <li>Daily actions & accountability inside the community</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Who It’s For</h3>
+        <ul class="small">
+          <li>Beginners who want their first assignment check</li>
+          <li>Solo hustlers or student interns learning the ropes</li>
+          <li>Anyone who needs a repeatable system to scale</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>What You’ll Learn</h3>
+        <ul class="small">
+          <li>How to pull lists that actually convert</li>
+          <li>Cold-calling scripts & objection handling</li>
+          <li>Repair estimates & offer strategy for newbies</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>About Arya</h3>
+        <p class="muted">I’m a hands-on wholesaler who built CoW so beginners can stop guessing and start doing. If you like simple checklists, clear goals, and reps that build confidence, you’ll fit right in.</p>
+      </div>
+    </div>
   </section>
 
-  <section id="calc" class="page">
-    <h1>Calculator</h1>
-    <p class="sub">Calculator page placeholder.</p>
-  </section>
-
-  <section id="resources" class="page">
-    <h1>Resources</h1>
-    <p class="sub">Resources page placeholder.</p>
-  </section>
-
-  <section id="notion" class="page">
-    <h1>Notion Hub</h1>
-    <p class="sub">Notion page placeholder.</p>
-  </section>
-
-  <section id="whop" class="page">
-    <h1>Whop</h1>
-    <p class="sub">Whop page placeholder.</p>
-  </section>
-
-  <section id="intern" class="page">
-    <h1>Internship</h1>
-    <p class="sub">Intern page placeholder.</p>
-  </section>
-
-  <section id="contact" class="page">
-    <h1>Contact</h1>
-    <p class="sub">Contact page placeholder.</p>
-  </section>
+  <!-- PLACEHOLDERS (we’ll fill these next) -->
+  <section id="calc" class="page"><h1>Calculator</h1><p class="sub">We’ll wire this up after the nav is locked.</p></section>
+  <section id="resources" class="page"><h1>Resources</h1><p class="sub">Placeholder.</p></section>
+  <section id="notion" class="page"><h1>Notion Hub</h1><p class="sub">Placeholder.</p></section>
+  <section id="whop" class="page"><h1>Whop</h1><p class="sub">Placeholder.</p></section>
+  <section id="intern" class="page"><h1>Internship</h1><p class="sub">Placeholder.</p></section>
+  <section id="contact" class="page"><h1>Contact</h1><p class="sub">Placeholder.</p></section>
 </main>
 
 <script>
-/* ultra-simple hash router */
-const PAGES = ["home","about","calc","resources","notion","whop","intern","contact"];
-
+/* ultra-simple hash router (unchanged) */
+const PAGES=["home","about","calc","resources","notion","whop","intern","contact"];
 function showPage(id){
-  // toggle page visibility
   PAGES.forEach(p=>{
-    const sec = document.getElementById(p);
+    const sec=document.getElementById(p);
     if(!sec) return;
-    sec.classList.toggle("active", p===id);
+    sec.classList.toggle("active",p===id);
   });
-  // toggle nav active
   document.querySelectorAll(".navlink").forEach(a=>{
-    a.classList.toggle("active", a.dataset.page===id);
+    a.classList.toggle("active",a.dataset.page===id);
   });
-  // scroll to top without smooth (prevents race conditions)
   window.scrollTo(0,0);
 }
-
 function route(){
-  const hash = (location.hash || "#home").slice(1);
-  showPage(PAGES.includes(hash) ? hash : "home");
+  const hash=(location.hash||"#home").slice(1);
+  showPage(PAGES.includes(hash)?hash:"home");
 }
-
-window.addEventListener("hashchange", route);
-document.addEventListener("DOMContentLoaded", route);
+window.addEventListener("hashchange",route);
+document.addEventListener("DOMContentLoaded",route);
 </script>
 </body>
 </html>
