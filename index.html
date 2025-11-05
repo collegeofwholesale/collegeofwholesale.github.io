@@ -417,7 +417,7 @@ if($("#rc_paint_in").checked){
     function resetRepairs(){
       ["rc_paint_in","rc_paint_out","rc_floor","rc_roof","rc_kitchen","rc_bath","rc_windows","rc_misc"]
         .forEach(id=>{ const el=$("#"+id); if(el) el.checked=false; });
-      $("#rc_k_qty").value=1; $("#rc_b_qty").value=1;
+$("#rc_bed_qty").value=1; $("#rc_b_qty").value=1;
       $("#rc_total").textContent = "$0";
       $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
     }
