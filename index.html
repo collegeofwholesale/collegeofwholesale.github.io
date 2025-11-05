@@ -314,7 +314,14 @@
   /* === Repair Calculator (Simple) ========================================= */
   (function(){
     // State multipliers (rough labor/material deltas vs national avg)
-    const STATE_MULT = { AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08, GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.99, KS:0.91, KY:0.90, LA:0.94, ME:1.04, MD:1.10, MA:1.18, MI:0.95, ... };
+const STATE_MULT = {
+  AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, DC:1.18,
+  FL:1.08, GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.99, KS:0.91, KY:0.90,
+  LA:0.94, ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.02, MS:0.88, MO:0.95, MT:1.00,
+  NE:0.98, NV:1.06, NH:1.06, NJ:1.15, NM:0.96, NY:1.18, NC:0.98, ND:1.00, OH:0.96,
+  OK:0.90, OR:1.10, PA:1.04, RI:1.08, SC:0.96, SD:0.98, TN:0.96, TX:0.98, UT:1.04,
+  VT:1.06, VA:1.02, WA:1.14, WV:0.92, WI:0.98, WY:0.98
+};
     // (You already have the full list in your file—keep yours; the ellipsis here is just to save space.)
 
     // Base rates (beginner-friendly)
