@@ -443,44 +443,43 @@ $("#rc_bed_qty").value=1; $("#rc_b_qty").value=1;
   </script>
 
   <!-- ====== MAO script (keep this) ====== -->
-  <script>
-  (function(){
-    const $ = (id)=>document.getElementById(id);
-    const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : "$0";
-    const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : "$0";
+  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
 
-    function calc(){
-      const arv = +($("#v1_arv").value||0);
-      const repairs = +($("#v1_repairs").value||0);
-      const disc = clamp(+($("#v1_disc").value||70),40,90) / 100;
-      const fee  = +($("#v1_fee").value||0);
-      const buf  = clamp(+($("#v1_buf").value||3),0,10) / 100;
+  function calc(){
+    const arv = +($("v1_arv").value||0);
+    const repairs = +($("v1_repairs").value||0);
+    const disc = clamp(+($("v1_disc").value||70),40,90) / 100;
+    const fee  = +($("v1_fee").value||0);
+    const buf  = clamp(+($("v1_buf").value||3),0,10) / 100;
 
-      const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
-      $("#v1_mao").textContent = money(Math.round(mao));
-      const low = Math.max(0, Math.round(mao * 0.90));
-      $("#v1_range").textContent = money(low) + " – " + money(Math.round(mao));
-    }
+    const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
+    $("v1_mao").textContent = money(Math.round(mao));
+    const low = Math.max(0, Math.round(mao * 0.90));
+    $("v1_range").textContent = money(low) + " – " + money(Math.round(mao));
+  }
 
-    function reset(){
-      $("#v1_arv").value = "";
-      $("#v1_repairs").value = "";
-      $("#v1_disc").value = 70;
-      $("#v1_fee").value = 10000;
-      $("#v1_buf").value = 3;
-      $("#v1_mao").textContent = "$0";
-      $("#v1_range").textContent = "$0 – $0";
-    }
+  function reset(){
+    $("v1_arv").value = "";
+    $("v1_repairs").value = "";
+    $("v1_disc").value = 70;
+    $("v1_fee").value  = 10000;
+    $("v1_buf").value  = 3;
+    $("v1_mao").textContent = "$0";
+    $("v1_range").textContent = "$0 – $0";
+  }
 
-    document.addEventListener("DOMContentLoaded", function(){
-      const calcBtn = $("#v1_calc");
-      const resetBtn = $("#v1_reset");
-      if(calcBtn) calcBtn.addEventListener("click", calc);
-      if(resetBtn) resetBtn.addEventListener("click", reset);
-    });
-  })();
-  </script>
-</section>
+  document.addEventListener("DOMContentLoaded", function(){
+    const calcBtn  = $("v1_calc");
+    const resetBtn = $("v1_reset");
+    if(calcBtn)  calcBtn.addEventListener("click", calc);
+    if(resetBtn) resetBtn.addEventListener("click", reset);
+  });
+})();
+</script>
 
 </section>
 <section id="resources" class="page">
