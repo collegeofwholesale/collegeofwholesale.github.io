@@ -391,6 +391,27 @@
           misc_flat: 2000,
           bedroom_paint_add: 150
         };
+// Region roof padded defaults (1200–1500 sf SFR, tear-off)
+const REGION_ROOF = {
+  newengland: 14000,
+  tristate: 13500,
+  westcoast: 15000,
+  florida: 11000,
+  southeast: 10500,
+  texas: 10000,
+  southwest: 10500,
+  midwest: 9500,
+};
+
+function applyRegionRoof(){
+  const sel = $("#rr_region");
+  if(!sel) return;
+  const val = REGION_ROOF[sel.value] || 0;
+  const input = $("#rc_roof_override");
+  if(input){ input.value = val || ""; }
+  const roofBox = $("#rc_roof");
+  if(roofBox) roofBox.checked = true; // ensure roof is counted
+}
 
         function buildStateDropdown(){
           const sel = $("#rc_state"); if(!sel) return;
