@@ -1,629 +1,385 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>College of Wholesale</title>
-<style>
-  :root{
-    --bg:#0b0f1a; --ink:#e6ebff; --muted:#9aa3b2; --line:#1e2740; --accent:#6ea8ff; --accent2:#8cffc7;
-    --card:#121829;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  a{color:var(--accent);text-decoration:none}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
-
-  /* NAV */
-  .nav{position:sticky;top:0;z-index:10;background:rgba(11,15,26,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  .navin{display:flex;gap:10px;align-items:center;min-height:60px}
-  .brand{font-weight:900;margin-right:auto}
-  .navlink{padding:8px 10px;border-radius:10px;white-space:nowrap}
-  .navlink.active{background:#173058}
-
-  /* PAGES */
-  section.page{display:none;padding:56px 0}
-  section.page.active{display:block}
-  h1{margin:0 0 8px;font-size:clamp(28px,4vw,44px)}
-  h2{margin:0 0 12px}
-  .sub{color:var(--muted);margin:0 0 16px}
-
-  /* Home */
-  .hero{padding:56px 0;background:radial-gradient(900px 350px at 50% -60%, rgba(110,168,255,.18), transparent 70%)}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
-  .chip{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px}
-
-  /* UI */
-  .btn{display:inline-block;background:linear-gradient(135deg,var(--accent),#7bb6ff);color:#08122b;font-weight:800;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
-  .btn.secondary{background:#0b1020;color:var(--ink);border:1px solid var(--line)}
-  .grid{display:grid;gap:14px}
-  .grid.quick{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-  .grid.two{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{background:linear-gradient(180deg,var(--card) 0%,#0f1424 100%);border:1px solid var(--line);border-radius:18px;padding:18px}
-  .grid.about{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  ul.small, ol.small{margin:8px 0 0 18px;color:var(--ink)}
-  .muted{color:var(--muted)}
-  /* form layout */
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
-  label{min-width:180px}
-  input[type="number"], select{background:#0c1322;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-  .hr{height:1px;background:var(--line);margin:12px 0}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>College of Wholesale</title>
+  <style>
+    /* minimal styles just to keep layout sane */
+    :root { --bg:#0f1620; --card:#131b27; --text:#e9eef7; --muted:#9bb0c9; --accent:#2f80ed; }
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.5 system-ui,Segoe UI,Roboto,Arial;color:var(--text);background:var(--bg)}
+    a{color:var(--text);text-decoration:none}
+    nav{position:sticky;top:0;background:#0e1520;border-bottom:1px solid #1c2736;z-index:10}
+    .nav{max-width:1100px;margin:0 auto;display:flex;gap:16px;align-items:center;padding:12px 16px}
+    .nav a{padding:6px 10px;border-radius:8px}
+    .nav a.active,.btn{background:var(--accent);color:#fff}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 16px}
+    h1{font-size:40px;margin:10px 0 16px}
+    h2{font-size:28px;margin:24px 0 10px}
+    h3{font-size:20px;margin:18px 0 8px}
+    .grid{display:grid;gap:16px}
+    .grid.about,.grid.quick{grid-template-columns:1fr}
+    @media(min-width:900px){ .grid.quick{grid-template-columns:1fr 1fr} }
+    .card{background:var(--card);border:1px solid #223044;border-radius:14px;padding:16px}
+    label{display:inline-block;min-width:180px}
+    input[type="number"], input[type="text"], select{background:#0c121b;border:1px solid #26364c;color:var(--text);padding:8px 10px;border-radius:8px}
+    .row{display:flex;gap:10px;align-items:center;margin:6px 0;flex-wrap:wrap}
+    .btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.secondary{background:#223144}
+    .small{color:var(--muted);font-size:13px}
+    .hr{height:1px;background:#213044;margin:20px 0}
+    .result h2{margin:0}
+    ul{margin:8px 0 0 18px}
+    li{margin:6px 0}
+    .kpi{font-size:28px;font-weight:800;margin:6px 0}
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
-<div class="nav">
-  <div class="wrap navin">
-    <div class="brand">College of Wholesale</div>
-    <a href="#home"      data-page="home"      class="navlink active">Home</a>
-    <a href="#about"     data-page="about"     class="navlink">About</a>
-    <a href="#calc"      data-page="calc"      class="navlink">Calculator</a>
-    <a href="#resources" data-page="resources" class="navlink">Resources</a>
-    <a href="#notion"    data-page="notion"    class="navlink">Notion Hub</a>
-    <a href="#whop"      data-page="whop"      class="navlink">Whop</a>
-    <a href="#intern"    data-page="intern"    class="navlink">Internship</a>
-    <a href="#contact"   data-page="contact"   class="navlink">Contact</a>
-  </div>
-</div>
+  <!-- NAV -->
+  <nav><div class="nav">
+    <strong>College of Wholesale</strong>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#calc" class="active">Calculator</a>
+    <a href="#resources">Resources</a>
+    <a href="#notion">Notion Hub</a>
+    <a href="#whop">Whop</a>
+    <a href="#intern">Internship</a>
+    <a href="#contact">Contact</a>
+  </div></nav>
 
-<!-- PAGES -->
-<main class="wrap">
+  <main class="wrap">
 
-  <!-- HOME -->
-  <section id="home" class="page active">
-    <div class="hero">
-      <h1>Learn wholesaling the simple way.<br/>Use the tools. Get the reps. Close the deal.</h1>
-      <p class="sub">CoW gives beginners a clear path: daily actions, beginner-friendly calculators, scripts, and a community that helps you win your first contract.</p>
-      <div class="chips">
-        <span class="chip">✅ Beginner-Friendly</span>
-        <span class="chip">🧮 Offer & Repair Calculator</span>
-        <span class="chip">📚 Notion SOPs</span>
-        <span class="chip">🟣 Whop Community (includes Discord)</span>
-      </div>
-
-      <!-- fixed: proper wrapper -->
+    <!-- HOME (trimmed) -->
+    <section id="home" class="page">
       <div class="grid quick">
-        <a class="btn secondary" href="#notion">Open Notion Hub</a>
-        <a class="btn secondary" href="#whop">Join on Whop</a>
-        <a class="btn secondary" href="#intern">Internship Program</a>
-        <a class="btn"           href="#calc">Open Calculator</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about" class="page">
-    <h1>About College of Wholesale</h1>
-    <p class="sub">Founded by Arya, CoW helps new wholesalers master fundamentals through systems, scripts, and reps — not theory.</p>
-
-    <div class="grid about">
-      <div class="card">
-        <h3>Mission & Values</h3>
-        <ul>
-          <li><strong>Keep it simple:</strong> clear steps, no fluff.</li>
-          <li><strong>Win with reps:</strong> daily actions beat “someday.”</li>
-          <li><strong>Serve sellers:</strong> solve real problems, not just chase spreads.</li>
-          <li><strong>Track & improve:</strong> metrics, reviews, iteration.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Why CoW Works</h3>
-        <ul>
-          <li><strong>Beginner-first tools:</strong> calculators, scripts, and SOPs you’ll actually use on calls.</li>
-          <li><strong>Accountability:</strong> a community rhythm (daily/weekly) so you don’t stall.</li>
-          <li><strong>Real-world SOPs:</strong> list pulling, tagging, follow-up, dispo — step-by-step.</li>
-          <li><strong>Copy the system:</strong> we standardize what works so you can scale it.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>What You’ll Learn</h3>
-        <ul>
-          <li>How to pull & clean niche lists (probate, code violations, liens, pre-foreclosures).</li>
-          <li>Cold-calling: opener → discovery → anchor → next step.</li>
-          <li>Repair estimates & offer strategy (simple, state-adjusted).</li>
-          <li>Lead tagging, tasking, and follow-up cadences that convert.</li>
-          <li>Dispo basics: buyers, packages, assignment flow.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Weekly Operating Rhythm</h3>
-        <ul>
-          <li><strong>Mon:</strong> pull 1 list, import, tag, queue 100 dials.</li>
-          <li><strong>Tue–Thu:</strong> 150–300 dials, 5+ quality convos/day, schedule follow-ups.</li>
-          <li><strong>Fri:</strong> repair/offer numbers, send offers, nurture updates.</li>
-          <li><strong>Sat:</strong> 60–90 min review: KPIs, wins, next week’s list.</li>
-        </ul>
-      </div>
-
-      <!-- fixed: these four were plain strings before -->
-      <div class="card">
-        <h3>Acquisition Methods</h3>
-        <ul class="small">
-          <li>Off-market: probate, liens, code violations, pre-foreclosures.</li>
-          <li>On-market/creative: FSBO/expireds, novations, seller-finance.</li>
-          <li>Micro-targeting: tired landlords, out-of-state owners, vacancy.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Wins We Track</h3>
-        <ul class="small">
-          <li>First live seller convo (week 1–2).</li>
-          <li>First signed offer sent (weeks 2–4).</li>
-          <li>First assignment check (target 60–120 days with steady reps).</li>
-        </ul>
-        <p class="muted small">Your timeline depends on reps, market, and list quality — we give you the path and accountability.</p>
-      </div>
-
-      <div class="card">
-        <h3>How CoW Is Different</h3>
-        <ul class="small">
-          <li>No guru fluff — we teach what you’ll say and do today.</li>
-          <li>Templates you can copy, not theory you’ll forget.</li>
-          <li>Beginner-friendly language + examples for every step.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>About Arya</h3>
-        <p class="muted">
-          I started wholesaling in <strong>January 2024</strong> and launched <strong>College of Wholesale</strong> in <strong>January 2025</strong> to give beginners a straight path:
-          reps, simple tools, and a community that holds you to your goals. If you like checklists, clear offers, and doing the work, you’ll fit right in.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CALCULATOR -->
-  <section id="calc" class="page">
-    <h1>College of Wholesale Offer Calculator</h1>
-    <p class="sub">Simple v1: enter ARV + Repairs to get a beginner-friendly MAO and first-offer range.</p>
-
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:8px">
-      <!-- Inputs -->
-      <div class="card">
-        <h3>Inputs</h3>
-
-        <div class="row">
-          <label for="v1_arv">After-Repair Value (ARV)</label>
-          <input id="v1_arv" type="number" min="0" step="1000" placeholder="e.g., 350000">
+        <div class="card">
+          <h2>Open Notion Hub</h2>
+          <p class="small">Your SOPs, trackers, and scripts.</p>
         </div>
-
-        <div class="row">
-          <label for="v1_repairs">Repairs (total $)</label>
-          <input id="v1_repairs" type="number" min="0" step="500" placeholder="e.g., 25000">
+        <div class="card">
+          <h2>Open Calculator</h2>
+          <p class="small">Fast MAO + repair estimator.</p>
         </div>
+      </div>
+    </section>
 
-        <div class="row">
-          <label for="v1_disc">Buyer Discount %</label>
-          <input id="v1_disc" type="number" min="40" max="90" step="1" value="70">
+    <!-- ABOUT -->
+    <section id="about" class="page">
+      <h1>About College of Wholesale</h1>
+      <div class="grid about">
+        <div class="card">
+          <h3>Mission & Values</h3>
+          <ul>
+            <li><strong>Keep it simple:</strong> clear steps, no fluff.</li>
+            <li><strong>Win with reps:</strong> daily actions beat “someday.”</li>
+            <li><strong>Serve sellers:</strong> solve real problems.</li>
+            <li><strong>Track & improve:</strong> metrics → iteration.</li>
+          </ul>
         </div>
+      </div>
+    </section>
 
-        <div class="row">
-          <label for="v1_fee">Your Assignment Fee ($)</label>
-          <input id="v1_fee" type="number" min="0" step="500" value="10000">
-        </div>
+    <!-- CALCULATOR -->
+    <section id="calc" class="page">
+      <h1>College of Wholesale Offer Calculator</h1>
+      <p class="small">Simple v1: enter ARV + Repairs to get a beginner-friendly MAO and first-offer range.</p>
 
-        <div class="row" style="align-items:flex-start;gap:10px">
-          <label for="v1_buf">Holding Buffer % of ARV</label>
-          <div>
+      <div class="grid quick">
+        <!-- Inputs -->
+        <div class="card">
+          <h3>Inputs</h3>
+          <div class="row">
+            <label for="v1_arv">After-Repair Value (ARV)</label>
+            <input id="v1_arv" type="number" min="0" step="1000" placeholder="e.g., 350000">
+          </div>
+          <div class="row">
+            <label for="v1_repairs">Repairs (total $)</label>
+            <input id="v1_repairs" type="number" min="0" step="500" placeholder="e.g., 25000">
+          </div>
+          <div class="row">
+            <label for="v1_disc">Buyer Discount %</label>
+            <input id="v1_disc" type="number" min="40" max="90" step="1" value="70">
+          </div>
+          <div class="row">
+            <label for="v1_fee">Your Assignment Fee ($)</label>
+            <input id="v1_fee" type="number" min="0" step="500" value="10000">
+          </div>
+          <div class="row">
+            <label for="v1_buf">Holding/Closing Buffer % of ARV</label>
             <input id="v1_buf" type="number" min="0" max="10" step="0.5" value="3">
-            <div class="small" style="margin-top:6px">
-              Tip: <strong>3% is average</strong> — leave 3% unless your buyer prefers different.
-            </div>
+          </div>
+          <p class="small">Tip: <strong>3% is average</strong> — leave 3% unless your buyer prefers different.</p>
+          <div class="row" style="gap:8px;margin-top:12px">
+            <button id="v1_calc" class="btn">Calculate MAO</button>
+            <button id="v1_reset" class="btn secondary">Reset</button>
+          </div>
+          <p class="small" style="margin-top:8px"><em>Formula: MAO ≈ (ARV × Discount) – Repairs – Your Fee – (ARV × Buffer)</em></p>
+        </div>
+
+        <!-- Results -->
+        <div class="card result">
+          <h3>Results</h3>
+          <div class="small">Max Allowable Offer (to seller)</div>
+          <div id="v1_mao" class="kpi">$0</div>
+          <div class="small">Suggested first-offer range</div>
+          <div id="v1_range" class="kpi">$0 – $0</div>
+          <div class="hr"></div>
+          <h4>Beginner Rules of Thumb</h4>
+          <ul class="small" style="margin:0 0 10px">
+            <li>Start with 70% rule (editable above).</li>
+            <li>Open 5–10% below MAO to leave room.</li>
+            <li>Use <strong>2–4% of ARV</strong> for closing/holding buffer (3% is a good default).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Repair Calculator (Option B / state-adjusted) -->
+      <div class="card" style="margin-top:18px">
+        <h3>Quick Repair Estimator (optional)</h3>
+        <p class="small">Fast ballpark using state multipliers. Use it to fill the Repairs box above.</p>
+
+        <div class="row" style="gap:18px;flex-wrap:wrap">
+          <div>
+            <label for="rc_state">State</label>
+            <select id="rc_state"></select>
+            <div class="small">Mult: <span id="rc_mult">×1.00</span></div>
+          </div>
+
+          <div>
+            <label for="rc_sqft">Square Footage</label>
+            <input id="rc_sqft" type="number" min="200" step="10" placeholder="e.g., 1400">
+          </div>
+        </div>
+
+        <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:10px">
+          <label><input type="checkbox" id="rc_paint_in"> Interior paint</label>
+          <label><input type="checkbox" id="rc_paint_out"> Exterior paint</label>
+          <label><input type="checkbox" id="rc_floor"> Flooring</label>
+          <label><input type="checkbox" id="rc_roof"> Roof</label>
+          <label><input type="checkbox" id="rc_kitchen"> Kitchen refresh</label>
+          <label><input type="checkbox" id="rc_bath"> Bath refresh</label>
+          <label><input type="checkbox" id="rc_windows"> Windows</label>
+          <label><input type="checkbox" id="rc_misc"> Misc/contingency</label>
+        </div>
+
+        <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:10px">
+          <div>
+            <label for="rc_b_qty"># Beds</label>
+            <input id="rc_b_qty" type="number" min="0" value="1" style="width:90px">
+          </div>
+          <div>
+            <label for="rc_ba_qty"># Baths</label>
+            <input id="rc_ba_qty" type="number" min="0" value="1" style="width:90px">
           </div>
         </div>
 
         <div class="row" style="gap:8px;margin-top:12px">
-          <button id="v1_calc" class="btn">Calculate MAO</button>
-          <button id="v1_reset" class="btn secondary">Reset</button>
+          <button id="rc_calc" class="btn">Estimate Repairs</button>
+          <button id="rc_reset" class="btn secondary">Reset</button>
+          <button id="rc_send" class="btn secondary">Use Latest Repair Total</button>
         </div>
-
-        <p class="small" style="margin-top:8px">
-          Formula: <em>MAO ≈ (ARV × Discount) − Repairs − Your Fee − (ARV × Buffer)</em>
-        </p>
-      </div>
-
-      <!-- Results -->
-      <div class="card">
-        <h3>Results</h3>
-        <div class="small">Max Allowable Offer (to seller)</div>
-        <div id="v1_mao" style="font-size:28px;font-weight:800;margin:6px 0">$0</div>
-
-        <div class="small">Suggested first-offer range</div>
-        <div id="v1_range" style="font-size:24px;font-weight:800;margin:6px 0">$0 – $0</div>
 
         <div class="hr"></div>
-        <h4 style="margin:0 0 6px">Beginner Rules of Thumb</h4>
-        <ul class="small" style="margin:0 0 18px">
-          <li>Start with 70% rule (editable above).</li>
-          <li>Open 5–10% below MAO to leave room.</li>
-          <li>Use <strong>2–4% of ARV</strong> for closing/holding buffer (3% is a good default).</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Quick Repair Estimator (now present & wired) -->
-    <div class="card" style="margin-top:18px">
-      <h3>Quick Repair Estimator (optional)</h3>
-      <p class="small">Fast ballpark using state multipliers. Use it to fill the Repairs box above.</p>
-
-      <div class="row" style="gap:18px;flex-wrap:wrap">
-        <div>
-          <label for="rc_state">State</label>
-          <select id="rc_state"></select>
-          <div class="small">Mult: <span id="rc_mult">x1.00</span></div>
-        </div>
-
-        <div>
-          <label for="rc_sqft">Square Footage</label>
-          <input id="rc_sqft" type="number" min="200" step="10" placeholder="e.g., 1400">
+        <div class="row">
+          <div class="card" style="flex:1">
+            <div class="small">Estimated Repairs</div>
+            <div id="rc_total" class="kpi">$0</div>
+            <ul id="rc_notes" class="small" style="margin:0">
+              <li>No items selected yet.</li>
+            </ul>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:10px">
-        <label><input type="checkbox" id="rc_paint_in"> Interior paint</label>
-        <label><input type="checkbox" id="rc_paint_out"> Exterior paint</label>
-        <label><input type="checkbox" id="rc_floor"> Flooring</label>
-        <label><input type="checkbox" id="rc_roof"> Roof</label>
-        <label><input type="checkbox" id="rc_kitchen"> Kitchen refresh</label>
-        <label><input type="checkbox" id="rc_bath"> Bath refresh</label>
-        <label><input type="checkbox" id="rc_windows"> Windows</label>
-        <label><input type="checkbox" id="rc_misc"> Misc/contingency</label>
+    <!-- RESOURCES -->
+    <section id="resources" class="page">
+      <h2>Resources</h2>
+      <div class="grid about">
+        <div class="card"><p class="small">Free beginner wholesaling training assets.</p></div>
       </div>
+    </section>
 
-      <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:10px">
-        <div>
-          <label for="rc_b_qty"># Beds</label>
-          <input id="rc_b_qty" type="number" min="0" value="1" style="width:90px">
-        </div>
-        <div>
-          <label for="rc_ba_qty"># Baths</label>
-          <input id="rc_ba_qty" type="number" min="0" value="1" style="width:90px">
-        </div>
-      </div>
+    <!-- NOTION / WHOP / INTERN / CONTACT (placeholders) -->
+    <section id="notion" class="page"><h2>Notion Hub</h2></section>
+    <section id="whop" class="page"><h2>Whop Membership</h2></section>
+    <section id="intern" class="page"><h2>Internship Program</h2></section>
+    <section id="contact" class="page"><h2>Contact</h2></section>
 
-      <div class="row" style="gap:8px;margin-top:12px">
-        <button id="rc_calc" class="btn">Estimate Repairs</button>
-        <button id="rc_reset" class="btn secondary">Reset</button>
-        <button id="rc_send" class="btn secondary">Use Latest Repair Total</button>
-      </div>
+  </main>
 
-      <div class="hr"></div>
-      <div class="row">
-        <div class="card" style="flex:1">
-          <div class="small">Estimated Repairs</div>
-          <div id="rc_total" style="font-size:28px;font-weight:800;margin:6px 0">$0</div>
-          <ul id="rc_notes" class="small" style="margin:0">
-            <li>No items selected yet.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <!-- ===== Scripts ===== -->
+  <script>
+    // Util
+    const $ = (q) => document.querySelector(q);
+    const money = (n) => isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-    <!-- Scripts for Calculator & Repair Estimator -->
-    <script>
-      // ===== Utilities
-      const $ = (q)=>document.querySelector(q);
-      const money = (n)=> isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
-      const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+    /* ---------- Main MAO calc ---------- */
+    (function(){
+      function calc(){
+        const arv = +($("#v1_arv").value||0);
+        const repairs = +($("#v1_repairs").value||0);
+        const disc = clamp(+( $("#v1_disc").value||70 ), 40, 90)/100;
+        const fee  = +($("#v1_fee").value||0);
+        const buf  = clamp(+( $("#v1_buf").value||3 ), 0, 10)/100;
 
-      // ===== MAO calc
-      (function(){
-        function calc(){
-          const arv = +($("#v1_arv").value||0);
-          const repairs = +($("#v1_repairs").value||0);
-          const disc = clamp(+($("#v1_disc").value||70),40,90)/100;
-          const fee  = +($("#v1_fee").value||0);
-          const buf  = clamp(+($("#v1_buf").value||3),0,10)/100;
+        const mao = Math.max(0, (arv * disc) - repairs - fee - (arv * buf));
+        const low = Math.max(0, Math.round(mao * 0.90)); // 10% under
+        $("#v1_mao").textContent = money(Math.round(mao));
+        $("#v1_range").textContent = money(low) + " – " + money(Math.round(mao));
+      }
+      function reset(){
+        $("#v1_arv").value = "";
+        $("#v1_repairs").value = "";
+        $("#v1_disc").value = 70;
+        $("#v1_fee").value = 10000;
+        $("#v1_buf").value = 3;
+        $("#v1_mao").textContent = "$0";
+        $("#v1_range").textContent = "$0 – $0";
+      }
+      document.addEventListener("DOMContentLoaded", ()=>{
+        $("#v1_calc")?.addEventListener("click", calc);
+        $("#v1_reset")?.addEventListener("click", reset);
+      });
+    })();
 
-          const mao = Math.max(0,(arv*disc) - repairs - fee - (arv*buf));
-          $("#v1_mao").textContent = money(Math.round(mao));
-          const low = Math.max(0, Math.round(mao*0.90));
-          $("#v1_range").textContent = money(low) + " – " + money(Math.round(mao));
-        }
-        function reset(){
-          $("#v1_arv").value = "";
-          $("#v1_repairs").value = "";
-          $("#v1_disc").value = 70;
-          $("#v1_fee").value  = 10000;
-          $("#v1_buf").value  = 3;
-          $("#v1_mao").textContent = "$0";
-          $("#v1_range").textContent = "$0 – $0";
-        }
-        document.addEventListener("DOMContentLoaded", ()=>{
-          $("#v1_calc")?.addEventListener("click", calc);
-          $("#v1_reset")?.addEventListener("click", reset);
+    /* ---------- Repair Estimator (state-adjusted) ---------- */
+    (function(){
+      // coarse state multipliers (labor/material deltas)
+      const STATE_MULT = {
+        AL:0.92, AK:1.30, AZ:1.02, AR:0.99, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08,
+        GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.98, KS:0.91, KY:0.98, LA:0.94,
+        ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.05, MS:0.92, MO:0.98, MT:0.98, NE:0.96,
+        NV:1.02, NH:1.04, NJ:1.18, NM:0.98, NY:1.18, NC:0.98, ND:0.96, OH:0.95, OK:0.92,
+        OR:1.06, PA:1.02, RI:1.06, SC:0.96, SD:0.96, TN:0.96, TX:0.98, UT:1.02, VT:1.06,
+        VA:1.02, WA:1.10, WV:0.92, WI:0.98, WY:0.96
+      };
+
+      // base rates (very beginner-friendly)
+      const RATES = {
+        paint_in_psf: 1.25,
+        paint_out_psf: 1.50,
+        floor_psf: 3.50,
+        roof_per_sq: 450,        // per roofing "square" (100 SF)
+        kitchen_base: 8000,      // light refresh
+        kitchen_sf_kicker_per_1000: 500, // add per 1,000 SF
+        bath_base: 3500,
+        window_each: 450,
+        misc_flat: 2000,
+        bedroom_paint_add: 150   // doors/closets per bedroom if interior paint selected
+      };
+
+      function buildStateDropdown(){
+        const sel = $("#rc_state");
+        if(!sel) return;
+        sel.innerHTML = "";
+        Object.keys(STATE_MULT).forEach(ab=>{
+          const o = document.createElement('option');
+          o.value = ab; o.textContent = ab;
+          sel.appendChild(o);
         });
-      })();
+        sel.value = "FL";
+        updateMultPill();
+      }
 
-      // ===== Repair Estimator
-      (function(){
-        const STATE_MULT = {
-          AL:0.92, AK:1.30, AZ:1.02, AR:0.90, CA:1.20, CO:1.08, CT:1.12, DE:1.04, FL:1.08,
-          GA:0.96, HI:1.40, ID:0.98, IL:1.05, IN:0.93, IA:0.98, KS:0.91, KY:0.98, LA:0.94,
-          ME:1.04, MD:1.10, MA:1.18, MI:0.95, MN:1.05, MS:0.92, MO:0.98, MT:0.98, NE:0.96,
-          NV:1.02, NH:1.04, NJ:1.18, NM:0.98, NY:1.18, NC:0.98, ND:0.96, OH:0.95, OK:0.92,
-          OR:1.06, PA:1.02, RI:1.06, SC:0.96, SD:0.96, TN:0.96, TX:0.98, UT:1.02, VT:1.06,
-          VA:1.02, WA:1.10, WV:0.92, WI:0.98, WY:0.96
-        };
-        const RATES = {
-          paint_in_psf: 1.25,
-          paint_out_psf: 1.50,
-          floor_psf: 3.50,
-          roof_per_sq: 450,
-          kitchen_base: 8000,
-          kitchen_sf_kicker_per_1000: 500,
-          bath_base: 3500,
-          window_each: 450,
-          misc_flat: 2000,
-          bedroom_paint_add: 150
-        };
+      function updateMultPill(){
+        const ab = $("#rc_state").value;
+        const mult = STATE_MULT[ab] ?? 1.00;
+        $("#rc_mult").textContent = `×${mult.toFixed(2)}`;
+      }
 
-        function buildStateDropdown(){
-          const sel = $("#rc_state"); if(!sel) return;
-          sel.innerHTML = "";
-          Object.keys(STATE_MULT).forEach(ab=>{
-            const o = document.createElement('option'); o.value=ab; o.textContent=ab; sel.appendChild(o);
-          });
-          sel.value = "FL";
-          updateMultPill();
-        }
-        function updateMultPill(){
-          const ab = $("#rc_state").value;
-          const mult = STATE_MULT[ab] ?? 1.00;
-          $("#rc_mult").textContent = `x${mult.toFixed(2)}`;
+      function calcRepairs(){
+        const sqft = +($("#rc_sqft").value||0);
+        if(!sqft || sqft < 200){ alert("Enter square footage (≥200)."); return 0; }
+        const mult = STATE_MULT[$("#rc_state").value] ?? 1.00;
+
+        let total = 0; const notes = [];
+
+        function add(label, raw){
+          const adj = raw * mult; total += adj;
+          notes.push(`${label}: ${money(adj)} (raw ${money(raw)} × ${mult.toFixed(2)})`);
         }
 
-        function calcRepairs(){
-          const sqft = +($("#rc_sqft").value||0);
-          if(!sqft || sqft<200){ alert("Enter square footage (≥200)."); return 0; }
-          const mult = STATE_MULT[$("#rc_state").value] ?? 1.00;
+        // Items
+        if($("#rc_paint_in").checked){
+          let raw = sqft * RATES.paint_in_psf;
+          const beds = Math.max(0, +($("#rc_b_qty").value||0));
+          raw += beds * RATES.bedroom_paint_add;
+          add("Interior paint", raw);
+        }
+        if($("#rc_paint_out").checked) add("Exterior paint", sqft * RATES.paint_out_psf);
+        if($("#rc_floor").checked)    add("Flooring",      sqft * RATES.floor_psf);
 
-          let total = 0; const notes = [];
-          const add = (label, raw)=>{ const adj=raw*mult; total+=adj; notes.push(`${label}: ${money(adj)} (raw ${money(raw)} × ${mult.toFixed(2)})`); };
-
-          if($("#rc_paint_in").checked){
-            let raw = sqft * RATES.paint_in_psf;
-            const beds = Math.max(0, +($("#rc_b_qty").value||0));
-            raw += beds * RATES.bedroom_paint_add;
-            add("Interior paint", raw);
-          }
-          if($("#rc_paint_out").checked) add("Exterior paint", sqft*RATES.paint_out_psf);
-          if($("#rc_floor").checked)     add("Flooring",      sqft*RATES.floor_psf);
-
-          if($("#rc_roof").checked){
-            const roofArea = sqft * 1.2;
-            const squares  = roofArea / 100;
-            add("Roof", squares * RATES.roof_per_sq);
-          }
-          if($("#rc_kitchen").checked){
-            const k = Math.max(1, +($("#rc_b_qty").value||1));
-            const kicker = Math.round((sqft/1000) * RATES.kitchen_sf_kicker_per_1000);
-            add(`Kitchen refresh ×${k}`, k * (RATES.kitchen_base + kicker));
-          }
-          if($("#rc_bath").checked){
-            const b = Math.max(1, +($("#rc_ba_qty").value||1));
-            add(`Bathroom refresh ×${b}`, b * RATES.bath_base);
-          }
-          if($("#rc_windows").checked){
-            const count = Math.max(1, Math.round(sqft/200));
-            add(`Windows ×${count}`, count * RATES.window_each);
-          }
-          if($("#rc_misc").checked) add("Misc/contingency", RATES.misc_flat);
-
-          $("#rc_total").textContent = money(total);
-          const ul = $("#rc_notes"); ul.innerHTML = "";
-          if(notes.length){ notes.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }); }
-          else{ ul.innerHTML = "<li>No items selected yet.</li>"; }
-          return total;
+        if($("#rc_roof").checked){
+          const roofArea = sqft * 1.2; // waste/pitch
+          const squares  = roofArea / 100;
+          add("Roof", squares * RATES.roof_per_sq);
         }
 
-        function resetRepairs(){
-          ["#rc_paint_in","#rc_paint_out","#rc_floor","#rc_roof","#rc_kitchen","#rc_bath","#rc_windows","#rc_misc"]
-            .forEach(q=>{ const el=$(q); if(el) el.checked=false; });
-          $("#rc_b_qty").value = 1; $("#rc_ba_qty").value = 1;
-          $("#rc_total").textContent = "$0";
-          $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
+        if($("#rc_kitchen").checked){
+          const k = Math.max(1, +($("#rc_b_qty").value||1));
+          const kicker = Math.round((sqft/1000) * RATES.kitchen_sf_kicker_per_1000);
+          add(`Kitchen refresh ×${k}`, k * (RATES.kitchen_base + kicker));
         }
 
-        document.addEventListener("DOMContentLoaded", ()=>{
-          buildStateDropdown();
-          $("#rc_state").addEventListener("change", updateMultPill);
-          $("#rc_calc").addEventListener("click", ()=>{
-            const t = calcRepairs();
-            if(t>0){
-              const repairs = document.getElementById("v1_repairs");
-              repairs.value = Math.round(t);
-              repairs.dispatchEvent(new Event("input"));
-            }
-          });
-          $("#rc_reset").addEventListener("click", resetRepairs);
-          $("#rc_send").addEventListener("click", ()=>{
-            const t = +($("#rc_total").textContent.replace(/[^0-9.]/g,"")||0);
-            if(t>0){
-              const repairs = document.getElementById("v1_repairs");
-              repairs.value = Math.round(t);
-              repairs.dispatchEvent(new Event("input"));
-              window.scrollTo({top:0, behavior:"smooth"});
-            }
-          });
+        if($("#rc_bath").checked){
+          const b = Math.max(1, +($("#rc_ba_qty").value||1));
+          add(`Bathroom refresh ×${b}`, b * RATES.bath_base);
+        }
+
+        if($("#rc_windows").checked){
+          const count = Math.max(1, Math.round(sqft / 200));
+          add(`Windows ×${count}`, count * RATES.window_each);
+        }
+
+        if($("#rc_misc").checked) add("Misc/contingency", RATES.misc_flat);
+
+        // Output
+        $("#rc_total").textContent = money(total);
+        const ul = $("#rc_notes"); ul.innerHTML = "";
+        if(notes.length){
+          notes.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+        }else{
+          ul.innerHTML = "<li>No items selected yet.</li>";
+        }
+        return total;
+      }
+
+      function resetRepairs(){
+        ["#rc_paint_in","#rc_paint_out","#rc_floor","#rc_roof","#rc_kitchen","#rc_bath","#rc_windows","#rc_misc"]
+          .forEach(q=>{ const el=$(q); if(el) el.checked=false; });
+        $("#rc_b_qty").value = 1; $("#rc_ba_qty").value = 1;
+        $("#rc_total").textContent = "$0";
+        $("#rc_notes").innerHTML = "<li>No items selected yet.</li>";
+      }
+
+      document.addEventListener("DOMContentLoaded", ()=>{
+        buildStateDropdown();
+        $("#rc_state").addEventListener("change", updateMultPill);
+        $("#rc_calc").addEventListener("click", ()=>{
+          const t = calcRepairs();
+          if(t>0){
+            const repairs = document.getElementById("v1_repairs");
+            repairs.value = Math.round(t);
+            repairs.dispatchEvent(new Event("input")); // for future hooks
+          }
         });
-      })();
-    </script>
-  </section>
-
-  <!-- RESOURCES -->
-  <section id="resources" class="page">
-    <h1>Resources</h1>
-    <p class="sub">Free beginner wholesaling training assets you can use today.</p>
-    <div class="grid two" style="margin-top:24px">
-      <div class="card">
-        <h3>Cold Call Opener Script</h3>
-        <p class="small">“Hey, is this {FirstName}? My name’s {YourName}. I’m buying a place nearby and wondered if you’d consider an offer on {Address} if the price made sense?”</p>
-      </div>
-      <div class="card">
-        <h3>Lead Tagging Rules</h3>
-        <ul class="small">
-          <li>Hot — Follow up tomorrow</li>
-          <li>Warm — Follow up in 1 week</li>
-          <li>Nurture — Follow up in 1 month</li>
-          <li>Long Term — Follow up in 3 months</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- NOTION -->
-  <section id="notion" class="page">
-    <h1>Notion Hub</h1>
-    <p class="sub">Your SOPs, trackers, scripts, and training modules — all in one place.</p>
-    <div class="grid two" style="margin-top:8px">
-      <div class="card">
-        <h3>Open the Hub</h3>
-        <p class="small">This takes you to the live Notion workspace with the full CoW system.</p>
-        <p><a class="btn" href="https://puzzled-sand-3fb.notion.site/Cold-Caller-HQ-1fc3f51148a7805ea4d7fde4cbafa676" target="_blank" rel="noopener">Open Notion Hub</a></p>
-      </div>
-      <div class="card">
-        <h3>What’s Inside</h3>
-        <ul class="small">
-          <li>Daily Action Checklist & KPI tracker</li>
-          <li>List building SOPs (probate, liens, code violations, pre-foreclosure)</li>
-          <li>Cold-calling scripts & objection handling</li>
-          <li>Repair estimate & offer workflow</li>
-          <li>Dispo basics and buyer outreach</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>How to Use It</h3>
-        <ol class="small">
-          <li>Duplicate the workspace sections you need.</li>
-          <li>Follow the checklists during your calling blocks.</li>
-          <li>Log calls, tag leads, and set next actions before you hang up.</li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHOP -->
-  <section id="whop" class="page">
-    <h1>Whop Membership</h1>
-    <p class="sub">Join for tools, trainings, and community access (Discord is included inside Whop).</p>
-    <div class="grid two" style="margin-top:8px">
-      <div class="card">
-        <h3>What You Get</h3>
-        <ul class="small">
-          <li>Notion SOPs, trackers, and templates</li>
-          <li>Scripts, objection handling, call reviews</li>
-          <li>Offer & repair calculators + updates</li>
-          <li>Private Discord channels (accountability)</li>
-          <li>Workshop replays and new drops</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Plans</h3>
-        <ul class="small">
-          <li><strong>Starter:</strong> New wholesalers who want reps and a clear checklist.</li>
-          <li><strong>Pro:</strong> Everything in Starter + deeper SOPs, reviews, and extras as released.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>How It Works</h3>
-        <ol class="small">
-          <li>Click “Join on Whop.”</li>
-          <li>Get instant access to the hub + Discord.</li>
-          <li>Follow the weekly rhythm and post your wins.</li>
-        </ol>
-        <p><a class="btn" href="https://whop.com/collegeofwholesale" target="_blank" rel="noopener">Join on Whop</a></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- INTERN -->
-  <section id="intern" class="page">
-    <h1>Internship Program</h1>
-    <p class="sub">Get real reps, learn the system, and earn commissions while you train.</p>
-    <div class="grid two" style="margin-top:8px">
-      <div class="card">
-        <h3>What You’ll Do</h3>
-        <ul class="small">
-          <li>Pull niche lists (probate, liens, code violations, pre-foreclosures)</li>
-          <li>Use dialer + scripts, tag leads in CRM</li>
-          <li>Estimate repairs, calculate offers, and follow up</li>
-          <li>Post weekly KPIs and wins in the community</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>What You’ll Learn</h3>
-        <ul class="small">
-          <li>List building & data cleaning</li>
-          <li>Cold calling, objections, and discovery</li>
-          <li>Repair estimates & beginner-friendly MAO</li>
-          <li>Dispo basics and buyer outreach</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Apply Now</h3>
-        <p class="small">Fill out the short application below. We’ll review and email you if accepted.</p>
-        <p><a class="btn" href="https://forms.gle/A9YYDr2bndLwWcEL7" target="_blank" rel="noopener">Apply on Google Form</a></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="page">
-    <h1>Contact</h1>
-    <p class="sub">For collabs, questions, or business — reach out below.</p>
-    <div class="grid two" style="margin-top:8px">
-      <div class="card">
-        <h3>Email</h3>
-        <p class="small">Best way for business + inbound wholesaling deals.</p>
-        <p><a class="btn" href="mailto:Collegeofwholesale@gmail.com">Collegeofwholesale@gmail.com</a></p>
-      </div>
-      <div class="card">
-        <h3>College of Wholesale Socials</h3>
-        <ul class="small">
-          <li><strong>TikTok:</strong> @college.of.wholesale</li>
-          <li><strong>Instagram:</strong> @college.of.wholesale</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Personal</h3>
-        <ul class="small">
-          <li><strong>Instagram:</strong> @aryasaliany</li>
-          <li><strong>TikTok:</strong> @aaarya345</li>
-        </ul>
-        <p class="small">Don’t message internship / business to personal. Use CoW accounts above.</p>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<script>
-/* ultra-simple hash router */
-const PAGES=["home","about","calc","resources","notion","whop","intern","contact"];
-function showPage(id){
-  PAGES.forEach(p=>{
-    const sec=document.getElementById(p);
-    if(!sec) return;
-    sec.classList.toggle("active",p===id);
-  });
-  document.querySelectorAll(".navlink").forEach(a=>{
-    a.classList.toggle("active",a.dataset.page===id);
-  });
-  window.scrollTo(0,0);
-}
-function route(){
-  const hash=(location.hash||"#home").slice(1);
-  showPage(PAGES.includes(hash)?hash:"home");
-}
-window.addEventListener("hashchange",route);
-document.addEventListener("DOMContentLoaded",route);
-</script>
+        $("#rc_reset").addEventListener("click", resetRepairs);
+        $("#rc_send").addEventListener("click", ()=>{
+          const t = +($("#rc_total").textContent.replace(/[^0-9.]/g,"")||0);
+          if(t>0){
+            const repairs = document.getElementById("v1_repairs");
+            repairs.value = Math.round(t);
+            repairs.dispatchEvent(new Event("input"));
+            window.scrollTo({top:0, behavior:"smooth"});
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
