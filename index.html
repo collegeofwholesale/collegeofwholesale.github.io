@@ -264,6 +264,34 @@
           <input id="rc_sqft" type="number" min="200" step="10" placeholder="e.g., 1400">
         </div>
       </div>
+<!-- Region Roof Defaults (padded for 1200–1500 sf SFR) -->
+<div class="row" style="gap:10px;flex-wrap:wrap;margin-top:10px">
+  <div>
+    <label for="rr_region">Market Region (roof)</label>
+    <select id="rr_region">
+      <option value="newengland">New England (NH/MA/ME/VT)</option>
+      <option value="tristate">NY/NJ/PA Tri-State</option>
+      <option value="westcoast">West Coast (CA/OR/WA)</option>
+      <option value="florida">Florida</option>
+      <option value="southeast">Southeast (GA/AL/TN/NC/SC)</option>
+      <option value="texas">Texas</option>
+      <option value="southwest">Southwest (AZ/NV/NM)</option>
+      <option value="midwest">Midwest (OH/MI/IN/IL)</option>
+    </select>
+    <div class="small">Uses padded region roof number to protect your spread.</div>
+  </div>
+
+  <div>
+    <label for="rc_roof_override">Roof cost override ($)</label>
+    <input id="rc_roof_override" type="number" min="0" step="100"
+           placeholder="auto-filled from region" style="width:200px">
+    <div class="small">Leave blank to use formula; fill to force this exact roof cost.</div>
+  </div>
+
+  <div style="align-self:flex-end">
+    <button id="rr_use" class="btn secondary">Use Region Default</button>
+  </div>
+</div>
 
       <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:10px">
         <label><input type="checkbox" id="rc_paint_in"> Interior paint</label>
