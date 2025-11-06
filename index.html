@@ -264,34 +264,6 @@
           <input id="rc_sqft" type="number" min="200" step="10" placeholder="e.g., 1400">
         </div>
       </div>
-<!-- Region Roof Defaults (padded for 1200–1500 sf SFR) -->
-<div class="row" style="gap:10px;flex-wrap:wrap;margin-top:10px">
-  <div>
-    <label for="rr_region">Market Region (roof)</label>
-    <select id="rr_region">
-      <option value="newengland">New England (NH/MA/ME/VT)</option>
-      <option value="tristate">NY/NJ/PA Tri-State</option>
-      <option value="westcoast">West Coast (CA/OR/WA)</option>
-      <option value="florida">Florida</option>
-      <option value="southeast">Southeast (GA/AL/TN/NC/SC)</option>
-      <option value="texas">Texas</option>
-      <option value="southwest">Southwest (AZ/NV/NM)</option>
-      <option value="midwest">Midwest (OH/MI/IN/IL)</option>
-    </select>
-    <div class="small">Uses padded region roof number to protect your spread.</div>
-  </div>
-
-  <div>
-    <label for="rc_roof_override">Roof cost override ($)</label>
-    <input id="rc_roof_override" type="number" min="0" step="100"
-           placeholder="auto-filled from region" style="width:200px">
-    <div class="small">Leave blank to use formula; fill to force this exact roof cost.</div>
-  </div>
-
-  <div style="align-self:flex-end">
-    <button id="rr_use" class="btn secondary">Use Region Default</button>
-  </div>
-</div>
 
       <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:10px">
         <label><input type="checkbox" id="rc_paint_in"> Interior paint</label>
@@ -391,27 +363,6 @@
           misc_flat: 2000,
           bedroom_paint_add: 150
         };
-// Region roof padded defaults (1200–1500 sf SFR, tear-off)
-const REGION_ROOF = {
-  newengland: 14000,
-  tristate: 13500,
-  westcoast: 15000,
-  florida: 11000,
-  southeast: 10500,
-  texas: 10000,
-  southwest: 10500,
-  midwest: 9500,
-};
-
-function applyRegionRoof(){
-  const sel = $("#rr_region");
-  if(!sel) return;
-  const val = REGION_ROOF[sel.value] || 0;
-  const input = $("#rc_roof_override");
-  if(input){ input.value = val || ""; }
-  const roofBox = $("#rc_roof");
-  if(roofBox) roofBox.checked = true; // ensure roof is counted
-}
 
         function buildStateDropdown(){
           const sel = $("#rc_state"); if(!sel) return;
@@ -445,17 +396,10 @@ function applyRegionRoof(){
           if($("#rc_paint_out").checked) add("Exterior paint", sqft*RATES.paint_out_psf);
           if($("#rc_floor").checked)     add("Flooring",      sqft*RATES.floor_psf);
 
-if($("#rc_roof").checked){
-  const override = +($("#rc_roof_override")?.value || 0);
-  if(override > 0){
-    add("Roof (region default)", override);
-  }else{
-    const roofArea = sqft * 1.2; // pitch factor
-    const squares  = roofArea / 100;
-    add("Roof", (squares * RATES.roof_per_sq) + (RATES.roof_base || 0));
-  }
-}
-
+          if($("#rc_roof").checked){
+            const roofArea = sqft * 1.2;
+            const squares  = roofArea / 100;
+            add("Roof", squares * RATES.roof_per_sq);
           }
           if($("#rc_kitchen").checked){
             const k = Math.max(1, +($("#rc_b_qty").value||1));
@@ -683,3 +627,4 @@ document.addEventListener("DOMContentLoaded",route);
 </script>
 </body>
 </html>
+
