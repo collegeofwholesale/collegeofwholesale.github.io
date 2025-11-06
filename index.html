@@ -445,10 +445,17 @@ function applyRegionRoof(){
           if($("#rc_paint_out").checked) add("Exterior paint", sqft*RATES.paint_out_psf);
           if($("#rc_floor").checked)     add("Flooring",      sqft*RATES.floor_psf);
 
-          if($("#rc_roof").checked){
-            const roofArea = sqft * 1.2;
-            const squares  = roofArea / 100;
-            add("Roof", squares * RATES.roof_per_sq);
+if($("#rc_roof").checked){
+  const override = +($("#rc_roof_override")?.value || 0);
+  if(override > 0){
+    add("Roof (region default)", override);
+  }else{
+    const roofArea = sqft * 1.2; // pitch factor
+    const squares  = roofArea / 100;
+    add("Roof", (squares * RATES.roof_per_sq) + (RATES.roof_base || 0));
+  }
+}
+
           }
           if($("#rc_kitchen").checked){
             const k = Math.max(1, +($("#rc_b_qty").value||1));
